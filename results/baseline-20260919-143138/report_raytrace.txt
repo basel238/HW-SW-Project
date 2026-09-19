@@ -1,0 +1,119 @@
+raytrace — timing and native perf evidence
+
+TIMING SCOPE
+The timing JSON comes from the separate unprofiled pyperformance invocation.
+Profile-run timings are excluded from this timing report.
+
+PROFILE SCOPE
+perf recorded the whole pyperformance command and inherited worker activity.
+Imports, calibration, framework activity, and other work during that command can appear.
+The event is cpu-clock:u. Width is summed sampling period in ns, not elapsed wall time.
+Native stacks use DWARF unwinding. Inline expansion is disabled during decoding.
+Self-time rows below are limited to at least 0.5%; the omitted tail still contributes to the total.
+Inspect raw/collection.log and raw/postprocess.log for lost samples and unwinding diagnostics.
+Successful file generation does not certify stack quality, timing stability, or completion of the assignment.
+
+JSON VALIDATION
+Unprofiled timing: raytrace; 60 finite, positive values.
+  Debug build metadata: present
+Profile execution receipt: raytrace; 10 finite, positive values.
+  Debug build metadata: present
+
+PYPERF show — UNPROFILED TIMING
+Mean +- std dev: 2.15 sec +- 0.02 sec
+
+PYPERF check — UNPROFILED TIMING
+The benchmark seems to be stable
+
+PYPERF stats — UNPROFILED TIMING
+Total duration: 2 min 52.5 sec
+Start date: 2026-09-19 14:32:45
+End date: 2026-09-19 14:35:42
+Raw value minimum: 2.12 sec
+Raw value maximum: 2.20 sec
+
+Number of calibration run: 0
+Number of run with values: 20
+Total number of run: 20
+
+Number of warmup per run: 1
+Number of value per run: 3
+Loop iterations per value: 1
+Total number of values: 60
+
+Minimum:         2.12 sec
+Median +- MAD:   2.14 sec +- 0.01 sec
+Mean +- std dev: 2.15 sec +- 0.02 sec
+Maximum:         2.20 sec
+
+  0th percentile: 2.12 sec (-1% of the mean) -- minimum
+  5th percentile: 2.13 sec (-1% of the mean)
+ 25th percentile: 2.13 sec (-1% of the mean) -- Q1
+ 50th percentile: 2.14 sec (-0% of the mean) -- median
+ 75th percentile: 2.17 sec (+1% of the mean) -- Q3
+ 95th percentile: 2.19 sec (+2% of the mean)
+100th percentile: 2.20 sec (+2% of the mean) -- maximum
+
+Number of outlier (out of 2.08 sec..2.22 sec): 0
+
+PERF SELF TIME — WHOLE PROFILE COMMAND
+# To display the perf.data header info, please use --header/--header-only options.
+#
+#
+# Total Lost Samples: 0
+#
+# Samples: 6K of event 'cpu-clock:u'
+# Event count (approx.): 30351755000
+#
+# Overhead  Command      Shared Object         Symbol                                                 IPC   [IPC Coverage]
+# ........  ...........  ....................  .....................................................  ....................
+#
+    25.41%  python       python3.10d           [.] _PyEval_EvalFrameDefault                           -      -            
+     2.86%  python       python3.10d           [.] lookdict_unicode_nodummy                           -      -            
+     2.80%  python       python3.10d           [.] call_function.lto_priv.0                           -      -            
+     2.65%  python       python3.10d           [.] frame_dealloc.lto_priv.0                           -      -            
+     2.55%  python       python3.10d           [.] _PyEval_MakeFrameVector                            -      -            
+     2.15%  python       python3.10d           [.] _PyType_Lookup                                     -      -            
+     1.95%  python       python3.10d           [.] binary_op1                                         -      -            
+     1.92%  python       python3.10d           [.] _PyMem_DebugCheckAddress                           -      -            
+     1.89%  python       python3.10d           [.] PyTuple_GetItem                                    -      -            
+     1.84%  python       python3.10d           [.] _PyObject_VectorcallTstate.lto_priv.10             -      -            
+     1.67%  python       python3.10d           [.] lookdict_split.lto_priv.0                          -      -            
+     1.61%  python       python3.10d           [.] _PyDict_GetItemHint                                -      -            
+     1.29%  python       libc.so.6             [.] pthread_getspecific@@GLIBC_2.34                    -      -            
+     1.29%  python       python3.10d           [.] _PyObject_GetMethod                                -      -            
+     1.24%  python       python3.10d           [.] insertdict                                         -      -            
+     1.18%  python       python3.10d           [.] read_size_t                                        -      -            
+     1.13%  python       python3.10d           [.] validate_list                                      -      -            
+     1.11%  python       python3.10d           [.] _PyEval_Vector                                     -      -            
+     0.96%  python       python3.10d           [.] PyType_IsSubtype                                   -      -            
+     0.94%  python       libc.so.6             [.] __memset_avx2_unaligned_erms                       -      -            
+     0.91%  python       python3.10d           [.] PyFloat_FromDouble                                 -      -            
+     0.88%  python       python3.10d           [.] PyGILState_Check                                   -      -            
+     0.86%  python       python3.10d           [.] _PyFrame_New_NoTrack                               -      -            
+     0.86%  python       python3.10d           [.] _PyObject_Malloc                                   -      -            
+     0.86%  python       python3.10d           [.] _PyUnicode_FromId                                  -      -            
+     0.84%  python       python3.10d           [.] _Py_CheckFunctionResult                            -      -            
+     0.76%  python       python3.10d           [.] float_mul.lto_priv.0                               -      -            
+     0.73%  python       python3.10d           [.] subtype_dealloc.lto_priv.0                         -      -            
+     0.71%  python       python3.10d           [.] _PyFunction_Vectorcall                             -      -            
+     0.70%  python       python3.10d           [.] _Py_NewReference                                   -      -            
+     0.66%  python       python3.10d           [.] PyDict_GetItemWithError                            -      -            
+     0.66%  python       python3.10d           [.] dict_dealloc.lto_priv.0                            -      -            
+     0.63%  python       python3.10d           [.] PyDict_Contains                                    -      -            
+     0.63%  python       python3.10d           [.] float_dealloc.lto_priv.0                           -      -            
+     0.60%  python       python3.10d           [.] _Py_Dealloc                                        -      -            
+     0.56%  python       python3.10d           [.] _PyObject_GenericSetAttrWithDict                   -      -            
+     0.55%  python       python3.10d           [.] _PyObject_MakeTpCall                               -      -            
+     0.53%  python       python3.10d           [.] PyObject_SetAttr                                   -      -            
+     0.53%  python       python3.10d           [.] _Py_CheckSlotResult                                -      -            
+     0.53%  python       python3.10d           [.] frame_alloc                                        -      -            
+     0.51%  python       python3.10d           [.] _PyDict_CheckConsistency                           -      -            
+
+
+#
+# (Cannot load tips.txt file, please install perf!)
+#
+
+Flamegraph input: 3069 distinct folded stack rows; 30351755000 ns total sampling period.
+This total is a sampling weight, not an exact elapsed-time measurement.

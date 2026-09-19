@@ -1,0 +1,4 @@
+[benchmarks]
+name	metafile
+nbody	manifests/profile/nbody/pyproject.toml
+raytrace	manifests/profile/raytrace/pyproject.toml

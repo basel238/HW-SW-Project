@@ -1,0 +1,115 @@
+nbody — timing and native perf evidence
+
+TIMING SCOPE
+The timing JSON comes from the separate unprofiled pyperformance invocation.
+Profile-run timings are excluded from this timing report.
+
+PROFILE SCOPE
+perf recorded the whole pyperformance command and inherited worker activity.
+Imports, calibration, framework activity, and other work during that command can appear.
+The event is cpu-clock:u. Width is summed sampling period in ns, not elapsed wall time.
+Native stacks use DWARF unwinding. Inline expansion is disabled during decoding.
+Self-time rows below are limited to at least 0.5%; the omitted tail still contributes to the total.
+Inspect raw/collection.log and raw/postprocess.log for lost samples and unwinding diagnostics.
+Successful file generation does not certify stack quality, timing stability, or completion of the assignment.
+
+JSON VALIDATION
+Unprofiled timing: nbody; 60 finite, positive values.
+  Debug build metadata: present
+Profile execution receipt: nbody; 40 finite, positive values.
+  Debug build metadata: present
+
+PYPERF show — UNPROFILED TIMING
+Mean +- std dev: 478 ms +- 2 ms
+
+PYPERF check — UNPROFILED TIMING
+Benchmark was run more times than necessary to get a stable result.
+Consider passing processes=4 to the Runner constructor to save time.
+The benchmark seems to be stable
+
+PYPERF stats — UNPROFILED TIMING
+Total duration: 38.5 sec
+Start date: 2026-09-19 14:31:49
+End date: 2026-09-19 14:32:31
+Raw value minimum: 475 ms
+Raw value maximum: 486 ms
+
+Number of calibration run: 0
+Number of run with values: 20
+Total number of run: 20
+
+Number of warmup per run: 1
+Number of value per run: 3
+Loop iterations per value: 1
+Total number of values: 60
+
+Minimum:         475 ms
+Median +- MAD:   477 ms +- 1 ms
+Mean +- std dev: 478 ms +- 2 ms
+Maximum:         486 ms
+
+  0th percentile: 475 ms (-1% of the mean) -- minimum
+  5th percentile: 476 ms (-0% of the mean)
+ 25th percentile: 476 ms (-0% of the mean) -- Q1
+ 50th percentile: 477 ms (-0% of the mean) -- median
+ 75th percentile: 478 ms (+0% of the mean) -- Q3
+ 95th percentile: 484 ms (+1% of the mean)
+100th percentile: 486 ms (+2% of the mean) -- maximum
+
+Number of outlier (out of 474 ms..480 ms): 9
+
+PERF SELF TIME — WHOLE PROFILE COMMAND
+# To display the perf.data header info, please use --header/--header-only options.
+#
+#
+# Total Lost Samples: 0
+#
+# Samples: 5K of event 'cpu-clock:u'
+# Event count (approx.): 26010047000
+#
+# Overhead  Command      Shared Object         Symbol                                        IPC   [IPC Coverage]
+# ........  ...........  ....................  ............................................  ....................
+#
+    36.98%  python       python3.10d           [.] _PyEval_EvalFrameDefault                  -      -            
+     4.42%  python       python3.10d           [.] binary_op1                                -      -            
+     3.21%  python       python3.10d           [.] float_mul.lto_priv.0                      -      -            
+     2.99%  python       python3.10d           [.] PyFloat_FromDouble                        -      -            
+     2.69%  python       python3.10d           [.] float_dealloc.lto_priv.0                  -      -            
+     2.01%  python       python3.10d           [.] list_ass_item.lto_priv.0                  -      -            
+     1.87%  python       python3.10d           [.] float_add.lto_priv.0                      -      -            
+     1.82%  python       python3.10d           [.] PyNumber_AsSsize_t                        -      -            
+     1.74%  python       python3.10d           [.] _Py_CheckSlotResult                       -      -            
+     1.55%  python       python3.10d           [.] float_sub.lto_priv.0                      -      -            
+     1.41%  python       python3.10d           [.] _PyNumber_Index                           -      -            
+     1.26%  python       libm.so.6             [.] __ieee754_pow_fma                         -      -            
+     1.26%  python       python3.10d           [.] list_item.lto_priv.0                      -      -            
+     1.24%  python       python3.10d           [.] PyObject_SetItem                          -      -            
+     1.24%  python       python3.10d           [.] list_ass_subscript.lto_priv.0             -      -            
+     1.24%  python       python3.10d           [.] validate_list                             -      -            
+     1.20%  python       python3.10d           [.] get_float_state                           -      -            
+     1.16%  python       python3.10d           [.] PyLong_AsSsize_t                          -      -            
+     1.14%  python       python3.10d           [.] _Py_NewReference                          -      -            
+     1.02%  python       python3.10d           [.] PyNumber_Multiply                         -      -            
+     0.99%  python       python3.10d           [.] PyObject_GetItem                          -      -            
+     0.99%  python       python3.10d           [.] binary_iop1                               -      -            
+     0.95%  python       python3.10d           [.] list_subscript.lto_priv.0                 -      -            
+     0.87%  python       python3.10d           [.] _Py_Dealloc                               -      -            
+     0.83%  python       python3.10d           [.] PyTuple_GetItem                           -      -            
+     0.75%  python       libc.so.6             [.] __memset_avx2_unaligned_erms              -      -            
+     0.75%  python       python3.10d           [.] lookdict_unicode_nodummy                  -      -            
+     0.73%  python       python3.10d           [.] _PyMem_DebugCheckAddress                  -      -            
+     0.66%  python       python3.10d           [.] float_pow.lto_priv.0                      -      -            
+     0.62%  python       python3.10d           [.] read_size_t                               -      -            
+     0.54%  python       python3.10d           [.] _PyObject_IsFreed                         -      -            
+     0.52%  python       libc.so.6             [.] pthread_getspecific@@GLIBC_2.34           -      -            
+     0.52%  python       python3.10d           [.] _PyObject_Malloc                          -      -            
+     0.50%  python       python3.10d           [.] _PyUnicode_CheckConsistency               -      -            
+     0.50%  python       python3.10d           [.] listiter_next.lto_priv.0                  -      -            
+
+
+#
+# (Cannot load tips.txt file, please install perf!)
+#
+
+Flamegraph input: 1280 distinct folded stack rows; 26010047000 ns total sampling period.
+This total is a sampling weight, not an exact elapsed-time measurement.
