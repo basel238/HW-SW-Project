@@ -1,0 +1,27 @@
+RAYTRACE — FIRST THREE STEPS: STUDENT REPORT TEMPLATE
+Status: unanswered; no measurement conclusions supplied by this package.
+
+1. Understand the benchmark
+Source: benchmarks/raytrace/run_benchmark.py
+Explain its purpose and dependencies. Identify scene, geometry, vector/ray data,
+pixel traversal, intersections, visibility, reflections, and timed boundary.
+How much work does one reported value represent? Is image-file I/O timed?
+Record the source version and relevant workload parameters.
+
+2. Understand the pyperformance results
+Run directory:
+Interpreter/build and environment:
+Unprofiled timing JSON:
+Reported metric and units:
+Central value, variability, worker count, and stability warnings:
+What does the timer include/exclude? What conditions could affect this run?
+
+3. Read the perf flamegraph
+SVG and raw-recording paths:
+Sampling event, frequency, unwinder, and command:
+Explain full-width callers and inclusive versus self cost.
+Identify visible native functions and relate them cautiously to source operations.
+What is attributable to the framework or interpreter? What remains unresolved?
+Remember: the recorded invocation includes framework startup and warmup.
+
+Steps 4 onward are outside this package; add them when you perform that work.

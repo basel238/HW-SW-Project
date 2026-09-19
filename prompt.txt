@@ -1,0 +1,21 @@
+AI PROMPT RECORD — INCOMPLETE CONVERSATION EXTRACT
+
+This records the request that commissioned this package. It is not a complete
+record of earlier project discussions. Add other AI prompts/instructions used
+for your final submission; do not present this extract as the full history.
+
+User request (2026-09-19, spelling preserved):
+"can we create a new workflow / set of scripts that does the invocations and timing of teh scripts, but never has overhead for teh python execution
+I want to be able to run and analyze the benchmarks only
+I don't care if we start from scrathcn and build a whole new directory
+I want it to be good and to the point
+Go over the assignment's PDF again and understand the steps and give ways to do exactly those steps
+leave the analysis and other stages for me
+only solve teh first 3 steps"
+
+Implementation scope explained in response:
+Direct shell invocation of the original benchmarks through pyperformance with
+debug CPython. Separate unprofiled timing, perf recording, and later processing.
+No custom Python workload wrapper or implemented optimization. No promise of
+zero profiling overhead or startup-free samples: the framework and perf remain.
+Benchmark interpretation and all later project stages remain the student's work.

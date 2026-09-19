@@ -1,0 +1,10 @@
+{
+  "repository": "https://github.com/brendangregg/FlameGraph",
+  "commit": "41fee1f99f9276008b7cd112fca19dc3ea84ac32",
+  "files": {
+    "flamegraph.pl": "088f82e6848a4f12a56e1e8e8170ee6761fccf12e5615cd64630f6b087c99ea7",
+    "stackcollapse-perf.pl": "74faa47a29d8df07cb06731dfd8bb94dc4c165b9d811ac6b4c9449eea2ac25d8",
+    "README.md": "206c05935af767364344818daecde320454c0712906f0f13b222ea9df601ad96",
+    "docs/cddl1.txt": "1ffb70c33c4f79f04e947facc5c7851f289609256aacb47fc115f700427d9520"
+  }
+}
