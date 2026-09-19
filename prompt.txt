@@ -19,3 +19,28 @@ debug CPython. Separate unprofiled timing, perf recording, and later processing.
 No custom Python workload wrapper or implemented optimization. No promise of
 zero profiling overhead or startup-free samples: the framework and perf remain.
 Benchmark interpretation and all later project stages remain the student's work.
+
+Follow-up requests (2026-09-19, spelling preserved):
+"what do you think about the results we are getting now?
+seems as if there is much noise around the run itself
+why is that being recorded?"
+
+"do the changes you think of doing
+apply them to /Users/baselsalameh/Desktop/M.Sc. Technion/Semester 6/HW:SW Co-Design/HW-SW-Project/"
+
+"I get this warning as well: root@ubuntu:~/HW-SW-Project# bash run_all.sh
+/root/HW-SW-Project/.venv/lib/python3.10/site-packages/pip/_internal/locations/_distutils.py:9: DeprecationWarning: The distutils package is deprecated and slated for removal in Python 3.12. Use setuptools or check PEP 632 for potential alternatives
+  from distutils.cmd import Command as DistutilsCommand
+/usr/lib/python3.10/distutils/command/install.py:13: DeprecationWarning: The distutils.sysconfig module is deprecated, use sysconfig instead
+  from distutils.sysconfig import get_config_vars, is_virtual_environment"
+
+Update scope:
+Keep genuine pyperformance timing. Default perf collection directly launches
+the original benchmark's pyperf worker using the same debug interpreter and
+prepared environment; no custom Python workload wrapper is added. Retain an
+optional whole-framework profile for the closest match to the guide. Provide
+timing-only retries and non-destructive redecoding of old recordings with a
+higher stack-depth limit. Replace our pip-based environment listing with
+importlib.metadata without hiding warnings from the underlying framework.
+Startup/warmup/harness activity and sampling overhead remain. Interpretation,
+optimization, and later project stages remain the student's work.

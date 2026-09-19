@@ -19,9 +19,14 @@ What does the timer include/exclude? What conditions could affect this run?
 3. Read the perf flamegraph
 SVG and raw-recording paths:
 Sampling event, frequency, unwinder, and command:
+Collection mode (worker/framework) and decoding depth:
 Explain full-width callers and inclusive versus self cost.
 Identify visible native functions and relate them cautiously to source operations.
 What is attributable to the framework or interpreter? What remains unresolved?
-Remember: the recorded invocation includes framework startup and warmup.
+Check stack-depth, missing-root, and lost-sample diagnostics.
+Direct-worker recording includes startup/imports, warmup, computation, worker
+pyperf metadata/bookkeeping, and shutdown. Framework mode also records the outer
+manager and dependency checks. State which scope your graph represents.
+Explain the different nbody state histories across timing and profiling calls.
 
 Steps 4 onward are outside this package; add them when you perform that work.

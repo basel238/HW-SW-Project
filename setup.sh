@@ -55,6 +55,9 @@ if [[ ! -x "$worker" ]]; then
         --manifest manifests/timing.manifest --benchmarks nbody,raytrace "${inherit[@]}"
 fi
 "$worker" -m pip install pyperf==2.10.0 psutil==7.0.0
+if [[ ! -e "$worker_env/bin/python3-dbg" ]]; then
+    ln -s python "$worker_env/bin/python3-dbg"
+fi
 validate_worker
 write_source_hashes > .prepared.sha256
 printf 'Setup complete. Next: bash collect.sh all\nNo benchmark measurements were collected by setup.\n'

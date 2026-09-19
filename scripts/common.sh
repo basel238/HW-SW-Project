@@ -40,17 +40,45 @@ worker_python() {
     "$PY" -c 'import sys; from pyperformance.run import get_run_id; print("venv/" + get_run_id(sys.executable).name + "/bin/python")'
 }
 validate_worker() {
-    local worker
+    local worker profile_worker
     worker="$ROOT/$(worker_python)"
+    profile_worker="$(dirname -- "$worker")/python3-dbg"
     [[ -x "$worker" ]] || die 'Prepared framework environment is missing; rerun setup.sh.'
-    "$worker" - "$PY" <<'PY'
+    [[ -x "$profile_worker" ]] || die 'Debug worker alias is missing; rerun setup.sh after applying this update.'
+    "$worker" - "$PY" "$profile_worker" <<'PY'
 import importlib.metadata as md
 import os, sys, sysconfig
-if not sysconfig.get_config_var('Py_DEBUG') or not os.path.samefile(sys.executable, sys.argv[1]):
+if not sysconfig.get_config_var('Py_DEBUG') or not all(os.path.samefile(sys.executable, p) for p in sys.argv[1:]):
     raise SystemExit('Framework worker is not the same debug executable as the launcher.')
 for name, version in [('pyperf','2.10.0'), ('psutil','7.0.0')]:
     if md.version(name) != version:
         raise SystemExit(f'Worker {name} must be {version}; rerun setup.sh.')
+PY
+}
+profile_arguments() {
+    # Read the existing upstream CLI settings BEFORE perf starts. This does not
+    # import a benchmark or add Python calls around its execution.
+    local bench=$1
+    "$PY" - "$ROOT" "$bench" <<'PY'
+from pathlib import Path
+import sys
+try:
+    import tomllib
+except ImportError:
+    import tomli as tomllib
+root, bench = Path(sys.argv[1]), sys.argv[2]
+meta = root / 'manifests' / 'profile' / bench / 'pyproject.toml'
+with meta.open('rb') as f:
+    settings = tomllib.load(f)['tool']['pyperformance']
+source = (meta.parent / settings['runscript']).resolve()
+if source != (root / 'benchmarks' / bench / 'run_benchmark.py').resolve():
+    raise SystemExit('Profile manifest must select the included original benchmark script.')
+args = settings['extra_opts']
+if not isinstance(args, list) or not args or any(not isinstance(x, str) or not x or '\n' in x or '\r' in x for x in args):
+    raise SystemExit('Invalid profile manifest arguments.')
+if '--processes=1' not in args or '--loops=1' not in args or '--warmups=1' not in args:
+    raise SystemExit('The worker profile protocol requires one process, one loop, and one warmup.')
+print('\n'.join(args))
 PY
 }
 selected_benchmarks() {

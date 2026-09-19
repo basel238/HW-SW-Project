@@ -1,69 +1,103 @@
 # First three coursework steps: nbody and raytrace
 
-A small, separate workflow for the assignment's benchmark study, pyperformance timing, and perf flamegraphs. It keeps the benchmark sources unchanged and invokes the debug interpreter through the real pyperformance command. There is no custom Python workload driver, FIFO control, cProfile, py-spy, hardware-counter campaign, or optimization.
+A small shell workflow for benchmark study, unprofiled pyperformance timing, and perf flamegraphs. Benchmark sources stay unchanged. Both timing and profiling use the verified **CPython debug build**. There is no custom Python workload wrapper, FIFO/ACK protocol, cProfile, py-spy, optimization, or automated bottleneck analysis.
 
-**There is no honest zero-overhead profiling method.** These scripts add no custom Python calls around the benchmark body. The original benchmark's pyperf harness remains, and perf recording itself costs resources. Timing and profiling use separate executions. The profile covers the whole pyperformance invocation, including its framework, worker startup, warmup, and benchmark activity; it is not an isolated hot-loop measurement.
+Timing runs through genuine pyperformance. **The default profile directly launches the original benchmark script in its existing pyperf worker mode**, using the same prepared worker environment. This avoids recording the outer pyperformance manager and its pip checks. Interpreter startup, imports, warmup, pyperf bookkeeping/metadata inside the worker, and shutdown remain in the recording; this is not a hot-loop-only or zero-overhead measurement. Timing and profiling are separate executions.
 
-## Run on the Ubuntu Linux VM
+## Run on the Ubuntu VM
 
-Use a quiet VM and avoid running other measurements or analysis concurrently. Run setup once, before collecting results:
+Run setup after installing this update, even if the previous version was already prepared. It creates the checked `python3-dbg` alias in the worker environment.
 
 ```bash
-cd course-first-three
+cd ~/HW-SW-Project
 bash setup.sh
 bash run_all.sh baseline
 ```
 
-On an Ubuntu VM missing system dependencies, use `bash setup.sh --install-system` once instead; it installs the debug interpreter and matching perf package through apt before preparing the environments.
+On Ubuntu, `bash setup.sh --install-system` also installs missing debug Python and matching perf system packages. Ordinary setup prepares the Python environments without collecting measurements. Keep the VM quiet and do not run another benchmark or analysis concurrently.
 
-`baseline` is an output label, not a benchmark name. Existing result directories are not overwritten. Omit the label to get a new timestamped name.
+`baseline` is an output label. Existing run directories are never overwritten. Omit the label to use a fresh timestamped name.
 
-For explicit separation between collection and processing:
+To separate collection from processing explicitly:
 
 ```bash
 bash collect.sh all baseline-2
-# All timing and recording finish before this next command.
 bash postprocess.sh results/baseline-2
 ```
 
-If processing is interrupted, fix the reported problem and use
-`bash postprocess.sh --retry results/baseline-2`. This regenerates incomplete
-derived files while preserving the collected data. Completed runs are never
-overwritten, even with `--retry`.
+For only one benchmark, use `bash script_nbody.sh nbody-check` or `bash script_raytrace.sh raytrace-check`. Both collect and then process; setup must already be complete.
 
-Collect only one benchmark:
+To repeat unprofiled raytrace timing without collecting another profile:
 
 ```bash
-bash script_nbody.sh nbody-check
-bash script_raytrace.sh raytrace-check
+bash collect.sh --timing-only raytrace raytrace-timing-2
+bash postprocess.sh results/raytrace-timing-2
 ```
 
-These two convenience scripts collect the selected benchmark and then process that result. Setup must already have finished. They do not install packages during measurement.
+That run produces timing evidence and a timing report, with no perf recording or flamegraph. Keep the original run, including any slow samples. The mode flags belong to `collect.sh`; the convenience wrappers accept only a run label.
 
-The default sampling frequency is 199 Hz. To request the guide's example frequency of 999 Hz:
+## Optional profile matching the guide's invocation
+
+The assignment's guide places perf around `python3-dbg -m pyperformance run ...`. The default direct-worker profile deliberately narrows that scope. To also collect the guide-style whole-framework profile:
 
 ```bash
-SAMPLE_HZ=999 bash collect.sh all guide-frequency
-bash postprocess.sh results/guide-frequency
+bash collect.sh --framework-profile all guide-reference
+bash postprocess.sh results/guide-reference
 ```
 
-Higher frequency produces more samples and larger recording overhead and files. Collection time depends on the VM and interpreter; decoding debug stacks can take much longer than recording. Progress messages distinguish recording from processing. Do not treat time spent generating a graph as benchmark execution time.
+This records the manager, dependency checks, workers, startup, and warmup as well as benchmark computation. Use its graph with that scope stated. It also collects separate unprofiled timing. `--framework-profile` and `--timing-only` cannot be combined.
 
-## What you receive
+For the example's 999 Hz frequency, prefix collection with `SAMPLE_HZ=999`; the default is 199 Hz. A higher frequency adds samples, recording overhead, and data. Neither the default direct-worker experiment nor the optional guide experiment automatically certifies coursework compliance: see [docs/ASSIGNMENT.md](docs/ASSIGNMENT.md).
 
-For a two-benchmark run, open these files first:
+## Reprocess old recordings without rerunning the benchmarks
+
+This update decodes stacks with `--max-stack 512`, replacing perf script's default 127-frame limit. It retains `--no-inline` for readability and the existing DWARF recording format. A larger decode limit cannot recover stack data that was never captured, and some stacks can still be incomplete.
+
+For example, preserve the earlier baseline and write a new set of derived results:
+
+```bash
+bash postprocess.sh --output results/baseline-redecoded results/baseline
+```
+
+The destination must not already exist. It contains derived reports/graphs and `origin.txt`, which points back to the original run; timing JSONs and raw perf recordings are not duplicated. The original measurements are preserved and no benchmark is executed. Run decoding on the collection VM while retaining the original binaries and environments for symbol resolution. Inspect the generated report's stack-depth/missing-root warnings before interpreting a changed graph. Older runs without `raw/collection-mode.txt` are treated as whole-framework recordings, which was their original scope.
+
+If processing an incomplete run was interrupted, fix the error and use `bash postprocess.sh --retry results/LABEL`. Retry regenerates incomplete derived outputs and does not replace completed output. Use `--output` to derive a separate view of an already completed run.
+
+## Scripts and folders
+
+| Path | Purpose |
+|---|---|
+| `setup.sh` | Install/verify dependencies, prepare debug environments, check interpreter identity, and record source/configuration hashes |
+| `collect.sh` | Collect unprofiled timing, then a separate profile unless `--timing-only`; log exact commands and retain raw evidence |
+| `postprocess.sh` | Read existing evidence; produce timing statistics, compact native self-time tables, and perf flamegraphs |
+| `run_all.sh` | Collect both benchmarks and then postprocess |
+| `script_nbody.sh`, `script_raytrace.sh` | Collect and postprocess just the named benchmark |
+| `scripts/common.sh` | Shared shell validation, paths, locks, and configuration helpers |
+| `benchmarks/` | Unchanged original benchmark scripts, active dependency lists, provenance, and license |
+| `manifests/timing/` | Timing source paths and workload/worker settings |
+| `manifests/profile/` | Profile settings used by both direct-worker and optional framework collection |
+| `vendor/FlameGraph/` | Bundled stack-collapse and SVG generation tools, provenance, and license |
+| `docs/` | Assignment mapping and validation notes |
+| `reports/` | Unanswered templates for your benchmark understanding and interpretation |
+| `results/` | Generated runs, excluded from Git |
+| `.venv/`, `venv/` | Launcher and pyperformance-managed worker environments, excluded from Git |
+
+Small Python commands validate configuration and read metadata **before recording**. They do not import or wrap the benchmark computation. Profiling invokes the upstream benchmark script directly; that script contains the original pyperf harness.
+
+## Results to open first
 
 | File under `results/LABEL/` | Purpose |
 |---|---|
-| `run.txt` | Commands, collection settings, and environment record |
-| `nbody.json`, `raytrace.json` | Unprofiled pyperformance timing results |
-| `nbody.svg`, `raytrace.svg` | Interactive perf flamegraphs; open in a browser |
-| `report_nbody.txt`, `report_raytrace.txt` | Readable timing summaries and compact native self-time tables |
-| `raw/` | Recordings, profile-run JSON, logs, source/settings snapshots, and processing intermediates |
+| `run.txt` | Exact commands, collection settings, interpreter and environment record |
+| `nbody.json`, `raytrace.json` | Unprofiled pyperformance timing results for the selected benchmarks |
+| `nbody.svg`, `raytrace.svg` | Interactive perf flamegraphs, absent for timing-only runs |
+| `report_nbody.txt`, `report_raytrace.txt` | Timing summaries, warnings, stack diagnostics, and compact native self-time tables where profiles exist |
+| `raw/` | Binary recordings, profile JSON, logs, source/settings snapshots, and compressed folded stacks |
+| `raw/collection-mode.txt` | `worker`, `framework`, or `timing-only`; identifies measurement scope |
 
-Keep `raw/` for reproducibility and later decoding. You do not need to read it for every review. A profile-run JSON measures execution under perf and must not replace the unprofiled timing JSON. The generated `report_*.txt` files are profiler tables, not completed coursework reports. Write your interpretation in the separate `reports/report_*.txt` templates.
+The profile JSON contains instrumented measurements; it must not replace the unprofiled timing JSON. Shell command durations in `run.txt` are operational information, not benchmark timing. Completion markers report tool completion, not successful academic analysis. Write your own explanation in the separate `reports/report_*.txt` templates.
 
-You can inspect timing JSON with the installed pyperf tool:
+Heavy processing occurs after collection. Decoding debug stacks can take longer than recording. Keep the raw recordings so later processing changes do not require new measurements.
 
 ```bash
 .venv/bin/python3-dbg -m pyperf show results/baseline/nbody.json
@@ -71,50 +105,63 @@ You can inspect timing JSON with the installed pyperf tool:
 .venv/bin/python3-dbg -m pyperf show results/baseline/raytrace.json
 ```
 
-Warnings about instability are evidence to investigate, not reasons to discard inconvenient samples. Do not compare profiled elapsed time with unprofiled benchmark time as if they were the same metric.
+## Measurement choices and limits
 
-## Measurement choices
+- **Interpreter:** setup uses `python3-dbg`; validation requires `Py_DEBUG=1` and the same real executable in both environments. A filename or Python's `-d` flag alone does not prove a debug build.
+- **Source:** original nbody and raytrace from pyperformance 1.14.0. Active benchmark dependencies are beside `benchmarks/NAME/run_benchmark.py`.
+- **Timing:** 20 sequential worker processes, three measured values each, one warmup, one loop per value. This is a fixed protocol, not a guarantee of statistical stability.
+- **Profiling:** one direct worker by default, one warmup, one loop per value; 40 nbody values or ten raytrace values. The profile settings are read from the existing manifests before perf starts.
+- **Workload:** 20,000 nbody steps or a 100 × 100 raytrace image per call. Nbody state evolves between calls; a 40-call profile follows a longer trajectory than each three-value timing worker.
+- **Sampling:** `cpu-clock:u`, 199 Hz by default, DWARF with a 16 KiB stack dump. This measures sampled user-space CPU activity, not IPC or hardware bottlenecks. Collection still has overhead.
+- **Child processes:** direct-worker collection uses `--no-inherit`; these original benchmarks compute in the worker's single main thread, so helper processes such as `lsb_release` are excluded. Framework mode retains inheritance so its actual benchmark workers are recorded. Reconsider this choice before substituting a threaded or multiprocess workload.
+- **Scope:** direct-worker graphs include startup, imports, warmup, computation, worker-side harness metadata, and shutdown. Whole-framework graphs additionally include the outer manager and its dependency checks. Percentages from the two scopes have different denominators.
 
-- **Interpreter:** debug CPython, verified by its build configuration. A process label such as `python` or `python3-dbg` alone does not prove the build type. Neither Python's `-d` flag nor debug symbols alone converts a release executable into a debug build.
-- **Source:** the included, unchanged nbody and raytrace benchmarks from pyperformance 1.14.0. Timing and profiling use the same sources and debug interpreter. Read `benchmarks/NAME/run_benchmark.py` for step 1.
-- **Timing:** 20 worker processes, three measured values per worker, one warmup value, one loop per value. This is a fixed protocol, not a promise of statistical stability.
-- **Profiling:** one worker, one warmup, one loop per value; 40 measured values for nbody and ten for raytrace. The workload per call remains nbody's 20,000 steps and raytrace's 100 × 100 scene. Nbody state evolves between calls, so this is a longer trajectory in one worker than the timing run; the two runs are not identical state histories.
-- **Stacks:** `cpu-clock:u`, explicit DWARF unwinding with a 16 KiB stack dump. This samples user-space CPU activity; it does not measure IPC or hardware bottlenecks. Processing disables inline expansion for readability while preserving the raw recording.
-- **Scope:** `perf record` surrounds the genuine `python3-dbg -m pyperformance run ...` command, as in the assignment guide. Prepared worker environments and offline package checks reduce preparation surprises, but the framework still executes inside that recording. Whole-invocation scope cannot be removed from aggregate measurements afterward by assumption.
+Flamegraph width is inclusive sampled weight, not a chronological interval or exclusive runtime. Shared callers can legitimately span the entire width. Python 3.10 native debug symbols expose CPython functions; they do not automatically supply Python source-function names. Deep or unresolved stacks require investigation, not an automatic conclusion that the benchmark is recursive or broken.
 
-Flamegraph width is inclusive sampled weight, not a chronological interval or a function's exclusive runtime. Shared callers can span the full width. Python 3.10 debug symbols expose native CPython functions; they do not automatically supply Python source-function names to perf. These are interpretation limits, not proof that a wide interpreter frame is a broken graph.
+## The distutils deprecation warning
 
-See [docs/ASSIGNMENT.md](docs/ASSIGNMENT.md) for the exact scope and the work that remains yours. No script marks the assignment complete.
+Python 3.10 can emit `DeprecationWarning` when the installed pip imports distutils. This warning does not mean the command failed or that a release interpreter was used. Check exit status and completion, and retain diagnostics.
 
-## Add this directory to your existing Git repository
+Our environment summary now lists installed distributions through `importlib.metadata`, so it does not start pip merely to print versions. Genuine pyperformance timing and optional framework profiling still perform their own pip checks; warnings from those commands remain in the raw collection log. We do not silence all warnings, edit benchmark code, or upgrade the measurement interpreter to hide this message.
 
-This is an additive installation. Keep the previous scripts and results until you decide to archive them. On your Mac, open a terminal **inside the extracted `course-first-three` directory**, then:
+## Git updates
+
+This project uses `git@github.com:basel238/HW-SW-Project.git`. On your Mac, review and commit changes in:
 
 ```bash
-repo='/Users/baselsalameh/Desktop/M.Sc. Technion/Semester 6/HW:SW Co-Design/HW-SW-Co-Design'
-mkdir -p "$repo/course-first-three"
-rsync -a --exclude '.venv/' --exclude 'venv/' --exclude '.prepared.sha256' --exclude '.workflow.lock' --exclude 'results/' --exclude '__pycache__/' ./ "$repo/course-first-three/"
-cd "$repo"
-git status --short
-git add course-first-three
-git diff --cached --stat
-git commit -m "Add direct coursework timing and perf workflow"
+cd '/Users/baselsalameh/Desktop/M.Sc. Technion/Semester 6/HW:SW Co-Design/HW-SW-Project'
+git status
 git branch --show-current
-git push -u origin "$(git branch --show-current)"
+git apply --check "$HOME/Downloads/hw-sw-project-worker-update.patch" && \
+  git apply "$HOME/Downloads/hw-sw-project-worker-update.patch"
+git diff
+git add -- README.md collect.sh postprocess.sh setup.sh scripts/common.sh \
+  docs/ASSIGNMENT.md docs/TESTING.md prompt.txt \
+  reports/report_nbody.txt reports/report_raytrace.txt \
+  manifests/profile/nbody/requirements.txt \
+  manifests/profile/raytrace/requirements.txt \
+  manifests/timing/raytrace/requirements.txt
+git diff --cached --stat
+git commit -m "Profile debug benchmark workers directly and improve stack decoding"
+git push origin HEAD
 ```
 
-Review any already-staged changes before committing; the commit includes everything staged. The package ignores environments and generated results. This pushes the current branch, not necessarily `main`, and does not merge it.
+Apply the patch once, against the original `course-first-three` package. If the
+check fails because your local files differ, stop and review the differences;
+do not force application or replace your local work. The three deleted manifest
+dependency lists were unused duplicates; active requirements remain beside the
+benchmark scripts. Review the staged changes before committing, including any
+changes that were already staged before this update.
 
-On the VM, in the existing repository, check `git status` first and preserve any local work. Fetch, switch to the **same branch printed on your Mac**, and pull that branch:
+After pushing, update the VM on that same branch between runs. For `main`:
 
 ```bash
-git fetch origin
-# Replace YOUR_BRANCH with the branch printed on your Mac.
-git switch YOUR_BRANCH
-git pull --ff-only origin YOUR_BRANCH
-cd course-first-three
+cd ~/HW-SW-Project
+git status
+git branch --show-current
+git pull --ff-only origin main
 bash setup.sh
-bash run_all.sh baseline
+bash run_all.sh
 ```
 
-If you merge your changes into `main` on GitHub first, use `main` instead. This package does not modify Git history, migrate old files, or merge branches for you.
+Preserve local work before pulling. Setup is required after this update. Existing result directories remain intact and the new run uses a fresh label. No script changes Git history, pushes commits, or migrates your old files.
