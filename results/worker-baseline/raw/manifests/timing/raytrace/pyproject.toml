@@ -1,0 +1,10 @@
+[project]
+name = "pyperformance_bm_raytrace"
+version = "1.14.0"
+requires-python = ">=3.10"
+dependencies = ["pyperf==2.10.0"]
+
+[tool.pyperformance]
+name = "raytrace"
+runscript = "../../../benchmarks/raytrace/run_benchmark.py"
+extra_opts = ["--loops=1", "--processes=20", "--values=3", "--warmups=1", "--width=100", "--height=100"]

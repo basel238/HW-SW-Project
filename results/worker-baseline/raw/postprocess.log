@@ -1,0 +1,7 @@
+
+Postprocessing started: 2026-09-19T15:16:05Z
+Input: /root/HW-SW-Project/results/worker-baseline
+Output: /root/HW-SW-Project/results/worker-baseline
+Scope: worker
+MAX_STACK: 512
+Postprocessing completed: 2026-09-19T15:16:15Z

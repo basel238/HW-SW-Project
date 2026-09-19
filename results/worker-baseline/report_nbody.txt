@@ -1,0 +1,125 @@
+nbody — saved measurement evidence
+Input run: /root/HW-SW-Project/results/worker-baseline
+
+TIMING SCOPE
+Timing comes from the separate unprofiled pyperformance invocation.
+Profile-run timings are excluded from the timing statistics below.
+
+PROFILE SCOPE
+perf recorded the original benchmark script directly in its pyperf worker mode.
+Interpreter startup, imports, warmup, calculation, worker metadata/bookkeeping and exit are included.
+The outer pyperformance framework and its pip checks are outside this recording.
+Worker-mode collection uses perf --no-inherit; child metadata utilities are excluded.
+Event: cpu-clock:u. Width is summed sampling period in ns, not elapsed wall time.
+Native DWARF decoding: inline expansion disabled; maximum native stack depth 512.
+Self-time rows show at least 0.5%; the omitted tail still contributes to the total.
+Inspect /root/HW-SW-Project/results/worker-baseline/raw/collection.log and /root/HW-SW-Project/results/worker-baseline/raw/postprocess.log for lost samples and unwind diagnostics.
+Successful processing does not certify stack quality, timing stability or coursework completion.
+
+JSON VALIDATION
+Unprofiled timing: nbody; 60 finite, positive values from 20 measured workers.
+  Debug build metadata: present
+Profile execution receipt: nbody; 40 finite, positive values from 1 measured workers.
+  Debug build metadata: present
+
+PYPERF show — UNPROFILED TIMING
+Mean +- std dev: 483 ms +- 1 ms
+
+PYPERF check — UNPROFILED TIMING
+Benchmark was run more times than necessary to get a stable result.
+Consider passing processes=1 to the Runner constructor to save time.
+The benchmark seems to be stable
+
+PYPERF stats — UNPROFILED TIMING
+Total duration: 38.8 sec
+Start date: 2026-09-19 15:11:34
+End date: 2026-09-19 15:12:17
+Raw value minimum: 483 ms
+Raw value maximum: 489 ms
+
+Number of calibration run: 0
+Number of run with values: 20
+Total number of run: 20
+
+Number of warmup per run: 1
+Number of value per run: 3
+Loop iterations per value: 1
+Total number of values: 60
+
+Minimum:         483 ms
+Median +- MAD:   483 ms +- 0 ms
+Mean +- std dev: 483 ms +- 1 ms
+Maximum:         489 ms
+
+  0th percentile: 483 ms (-0% of the mean) -- minimum
+  5th percentile: 483 ms (-0% of the mean)
+ 25th percentile: 483 ms (-0% of the mean) -- Q1
+ 50th percentile: 483 ms (-0% of the mean) -- median
+ 75th percentile: 484 ms (+0% of the mean) -- Q3
+ 95th percentile: 484 ms (+0% of the mean)
+100th percentile: 489 ms (+1% of the mean) -- maximum
+
+Number of outlier (out of 482 ms..485 ms): 2
+
+PERF SELF TIME — worker PROFILE COMMAND
+# To display the perf.data header info, please use --header/--header-only options.
+#
+#
+# Total Lost Samples: 0
+#
+# Samples: 3K of event 'cpu-clock:u'
+# Event count (approx.): 19763816625
+#
+# Overhead  Command      Shared Object     Symbol                               IPC   [IPC Coverage]
+# ........  ...........  ................  ...................................  ....................
+#
+    45.54%  python3-dbg  python3.10d       [.] _PyEval_EvalFrameDefault         -      -            
+     5.57%  python3-dbg  python3.10d       [.] binary_op1                       -      -            
+     3.99%  python3-dbg  python3.10d       [.] PyFloat_FromDouble               -      -            
+     3.81%  python3-dbg  python3.10d       [.] float_mul.lto_priv.0             -      -            
+     3.48%  python3-dbg  python3.10d       [.] float_dealloc.lto_priv.0         -      -            
+     2.75%  python3-dbg  python3.10d       [.] list_ass_item.lto_priv.0         -      -            
+     2.67%  python3-dbg  python3.10d       [.] _Py_CheckSlotResult              -      -            
+     2.49%  python3-dbg  python3.10d       [.] PyNumber_AsSsize_t               -      -            
+     2.08%  python3-dbg  python3.10d       [.] float_add.lto_priv.0             -      -            
+     2.01%  python3-dbg  libm.so.6         [.] __ieee754_pow_fma                -      -            
+     1.75%  python3-dbg  python3.10d       [.] _PyNumber_Index                  -      -            
+     1.70%  python3-dbg  python3.10d       [.] float_sub.lto_priv.0             -      -            
+     1.68%  python3-dbg  python3.10d       [.] PyObject_SetItem                 -      -            
+     1.68%  python3-dbg  python3.10d       [.] list_ass_subscript.lto_priv.0    -      -            
+     1.58%  python3-dbg  python3.10d       [.] get_float_state                  -      -            
+     1.42%  python3-dbg  python3.10d       [.] _Py_NewReference                 -      -            
+     1.37%  python3-dbg  python3.10d       [.] PyObject_GetItem                 -      -            
+     1.25%  python3-dbg  python3.10d       [.] binary_iop1                      -      -            
+     1.20%  python3-dbg  python3.10d       [.] PyLong_AsSsize_t                 -      -            
+     1.20%  python3-dbg  python3.10d       [.] _Py_Dealloc                      -      -            
+     1.20%  python3-dbg  python3.10d       [.] list_item.lto_priv.0             -      -            
+     0.94%  python3-dbg  python3.10d       [.] list_subscript.lto_priv.0        -      -            
+     0.89%  python3-dbg  python3.10d       [.] PyNumber_Multiply                -      -            
+     0.84%  python3-dbg  python3.10d       [.] listiter_next.lto_priv.0         -      -            
+     0.76%  python3-dbg  python3.10d       [.] PyTuple_GetItem                  -      -            
+     0.74%  python3-dbg  python3.10d       [.] float_pow.lto_priv.0             -      -            
+     0.56%  python3-dbg  python3.10d       [.] ternary_op                       -      -            
+
+
+#
+# (Cannot load tips.txt file, please install perf!)
+#
+
+STACK CHECKS — 177 distinct folded rows; 19763816625 ns total sampling period
+Percentages below use sampling-period weight, not a count of distinct rows or elapsed time.
+Maximum folded native depth: 161 (process-name frame excluded).
+At/above decoder limit 512: 0.000% of weight.
+Without an exact _start frame: 0.636% of weight.
+Both at the limit and without _start: 0.000% of weight.
+Containing literal [unknown]/unknown frames: 0.636% of weight.
+These categories overlap. Missing _start alone does not prove truncation.
+Unknown symbols can also be replaced by DSO labels during folding; this is not an exhaustive unresolved-symbol check.
+Native depth distribution (sampling-period weight):
+     1..31  :   0.127%
+    32..63  :   0.025%
+    64..126 :  99.161%
+   127..255 :   0.686%
+A larger decode limit cannot restore bytes absent from the original capture.
+Only if ancestry remains demonstrably truncated after deeper decoding, consider a new capture using perf --call-graph dwarf,32768; this increases recording overhead and file size.
+These checks flag review needs; they do not certify stack correctness.

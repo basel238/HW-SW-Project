@@ -1,0 +1,10 @@
+[project]
+name = "pyperformance_bm_nbody"
+version = "1.14.0"
+requires-python = ">=3.10"
+dependencies = ["pyperf==2.10.0"]
+
+[tool.pyperformance]
+name = "nbody"
+runscript = "../../../benchmarks/nbody/run_benchmark.py"
+extra_opts = ["--loops=1", "--processes=20", "--values=3", "--warmups=1", "--iterations=20000"]
